@@ -26,6 +26,7 @@ define(function(require) {
 	var $ = require('jquery');
 	var OC = require('OC');
 	var Radio = require('radio');
+	var MessageCollection = require('models/messagecollection');
 
 	Radio.message.reply('sync', syncFolder);
 

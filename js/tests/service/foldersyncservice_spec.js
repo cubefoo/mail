@@ -48,7 +48,8 @@ define([
 			});
 			var folder = new Folder({
 				id: 'SU5CT1g=',
-				syncToken: 'oldToken'
+				syncToken: 'oldToken',
+				account: account
 			});
 			folder.addMessage(new Message({
 				id: 123
@@ -56,8 +57,6 @@ define([
 			folder.addMessage(new Message({
 				id: 124
 			}));
-
-			folder.account = account;
 
 			var syncing = FolderSyncService.syncFolder(folder);
 
@@ -94,7 +93,8 @@ define([
 			});
 			var folder = new Folder({
 				id: 'SU5CT1g=',
-				syncToken: 'oldToken'
+				syncToken: 'oldToken',
+				account: account
 			});
 			folder.addMessage(new Message({
 				id: 123
@@ -102,8 +102,6 @@ define([
 			folder.addMessage(new Message({
 				id: 124
 			}));
-
-			folder.account = account;
 
 			var syncing = FolderSyncService.syncFolder(folder);
 
@@ -140,7 +138,8 @@ define([
 			});
 			var folder = new Folder({
 				id: 'SU5CT1g=',
-				syncToken: 'oldToken'
+				syncToken: 'oldToken',
+				account: account
 			});
 			folder.addMessage(new Message({
 				id: 123,
@@ -149,8 +148,6 @@ define([
 			folder.addMessage(new Message({
 				id: 124
 			}));
-
-			folder.account = account;
 
 			var syncing = FolderSyncService.syncFolder(folder);
 
@@ -189,7 +186,8 @@ define([
 			});
 			var folder = new Folder({
 				id: 'SU5CT1g=',
-				syncToken: 'oldToken'
+				syncToken: 'oldToken',
+				account: account
 			});
 			folder.addMessage(new Message({
 				id: 123,
@@ -198,8 +196,6 @@ define([
 			folder.addMessage(new Message({
 				id: 124
 			}));
-
-			folder.account = account;
 
 			var syncing = FolderSyncService.syncFolder(folder);
 
@@ -235,9 +231,8 @@ define([
 				isUnified: true
 			});
 			var folder = new Folder({
-
+				account: account
 			});
-			folder.account = account;
 
 			var syncing = FolderSyncService.syncFolder(folder);
 			expect(server.requests.length).toBe(0);
@@ -251,25 +246,30 @@ define([
 				isUnified: true
 			});
 			var folder = new Folder({
-
+				account: account
 			});
 			var acc1 = new Account({
 				accountId: 1
 			});
 			var folder11 = new Folder({
-				specialRole: 'inbox'
+				specialRole: 'inbox',
+				account: account
 			});
 			var folder12 = new Folder({
-				specialRole: 'sent'
+				specialRole: 'sent',
+				account: account
 			});
 			var acc2 = new Account({
-				accountId: 2
+				accountId: 2,
+				account: account
 			});
 			var folder21 = new Folder({
-				specialRole: 'inbox'
+				specialRole: 'inbox',
+				account: account
 			});
 			var folder22 = new Folder({
-				specialRole: 'inbox'
+				specialRole: 'inbox',
+				account: account
 			});
 			acc1.addFolder(folder11);
 			acc1.addFolder(folder12);
@@ -280,13 +280,13 @@ define([
 			// Add some messages
 			folder21.addMessage(new Message({
 				id: 234,
-				subject: 'old sub'
+				subject: 'old sub',
+				account: acc2
 			}));
 			folder22.addMessage(new Message({
-				id: 345
+				id: 345,
+				account: acc2
 			}));
-
-			folder.account = account;
 
 			var syncing = FolderSyncService.syncFolder(folder);
 			expect(server.requests.length).toBe(3);

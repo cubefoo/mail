@@ -30,6 +30,7 @@ define(function(require) {
 		initialize: function() {
 			var FolderCollection = require('models/foldercollection');
 			var MessageCollection = require('models/messagecollection');
+			var UnifiedMessageCollection = require('models/unifiedmessagecollection');
 			this.account = this.get('account');
 			this.unset('account');
 			this.folders = new FolderCollection(this.get('folders') || []);
@@ -37,7 +38,11 @@ define(function(require) {
 				folder.account = this.account;
 			}, this));
 			this.unset('folders');
-			this.messages = new MessageCollection();
+			if (this.account && this.account.get('isUnified')) {
+				this.messages = new UnifiedMessageCollection();
+			} else {
+				this.messages = new MessageCollection();
+			}
 		},
 		toggleOpen: function() {
 			this.set({open: !this.get('open')});
@@ -48,10 +53,10 @@ define(function(require) {
 		 */
 		addMessage: function(message) {
 			message.folder = this;
-			this.messages.add(message);
+			this.messages.add(message, this);
 		},
 		/**
-		 * @param {Array<Message>} message
+		 * @param {Array<Message>} messages
 		 * @returns {undefined}
 		 */
 		addMessages: function(messages) {

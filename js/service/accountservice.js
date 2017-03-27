@@ -23,21 +23,23 @@ define(function(require) {
 
 	function createAccount(config) {
 		var url = OC.generateUrl('apps/mail/accounts');
-		return new Promise($.ajax(url, {
-			data: config,
-			type: 'POST',
-			error: function(jqXHR, textStatus, errorThrown) {
-				switch (jqXHR.status) {
-					case 400:
-						var response = JSON.parse(jqXHR.responseText);
-						throw new Error(response.message);
-						break;
-					default:
-						var error = errorThrown || textStatus || t('mail', 'Unknown error');
-						throw new Error(t('mail', 'Error while creating an account: ' + error));
+		return new Promise(function(resolve, reject) {
+			return $.ajax(url, {
+				data: config,
+				type: 'POST',
+				error: function(jqXHR, textStatus, errorThrown) {
+					switch (jqXHR.status) {
+						case 400:
+							var response = JSON.parse(jqXHR.responseText);
+							throw new Error(response.message);
+							break;
+						default:
+							var error = errorThrown || textStatus || t('mail', 'Unknown error');
+							reject(t('mail', 'Error while creating an account: ' + error));
+					}
 				}
-			}
-		}));
+			});
+		});
 	}
 
 	/**
