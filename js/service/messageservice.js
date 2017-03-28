@@ -162,6 +162,10 @@ define(function(require) {
 				return message.get('dateInt') * -1;
 			}).slice(0, 20);
 
+			nextPage.forEach(function(msg) {
+				msg.set('unifiedId' , unifiedFolder.messages.getUnifiedId(msg));
+			});
+
 			unifiedFolder.addMessages(nextPage, unifiedFolder);
 		});
 	}

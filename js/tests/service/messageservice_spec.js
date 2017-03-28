@@ -153,7 +153,6 @@ define([
 			expect(server.requests.length).toBe(0);
 
 			fetching.then(function() {
-				console.error(unifiedInbox.messages.pluck('hash'));
 				expect(unifiedInbox.messages.length).toBe(20);
 				done();
 			}).catch(done.fail);
@@ -182,7 +181,8 @@ define([
 				JSON.stringify([
 					{
 						id: 123,
-						subject: 'hello'
+						subject: 'hello',
+						dateInt: 26000
 					}
 				])
 				);

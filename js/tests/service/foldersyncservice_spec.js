@@ -345,8 +345,7 @@ define([
 				// New message saved to first inbox
 				expect(folder11.messages.pluck('id')).toEqual([123]);
 				// Update applied in second inbox
-				expect(folder21.messages.get(234).
-					get('subject')).toEqual('new sub');
+				expect(folder21.messages.first().get('subject')).toEqual('new sub');
 				// Vanished messag in third inbox is removed
 				expect(folder22.messages.pluck('id')).toEqual([]);
 
