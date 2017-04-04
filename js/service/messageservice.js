@@ -68,7 +68,6 @@ define(function(require) {
 				}
 			}
 		})).then(function(messages) {
-			console.log('messages', messages);
 			var collection = folder.messages;
 			folder.addMessages(messages);
 			folder.set('messagesLoaded', true);
@@ -93,10 +92,16 @@ define(function(require) {
 		}, []).map(function(otherInbox) {
 			return getFolderMessages(otherInbox, options)
 				.then(function(messages) {
-					console.log('loaded ' + messages.length + 'messages', messages);
 					folder.addMessages(messages.models);
 				});
-		}));
+		})).then(function() {
+			// Truncate after 20 messages
+			// TODO: there might be a more efficient/convenient
+			// Backbone.Collection or underscore helper function
+			var top20 = folder.messages.slice(0, 20);
+			folder.messages.reset();
+			folder.addMessages(top20);
+		});
 	}
 
 	/**
@@ -122,48 +127,48 @@ define(function(require) {
 			cursor = unifiedFolder.messages.last().get('dateInt');
 		}
 
-		// Load data from folders where we do not have enough data
-		return Promise.all(allAccounts.filter(function(account) {
+		var individualAccounts = allAccounts.filter(function(account) {
 			// Only non-unified accounts
 			return !account.get('isUnified');
-		}).map(function(account) {
+		});
+
+		// Load data from folders where we do not have enough data
+		return Promise.all(individualAccounts.map(function(account) {
 			return Promise.all(account.folders.filter(function(folder) {
 				// Only consider inboxes
 				// TODO: generalize for other combined mailboxes
-				return folder.get('specialUse') === 'inbox';
+				return folder.get('specialRole') === 'inbox';
 			}).filter(function(folder) {
 				// Only fetch mailboxes that do not have enough data
 				return folder.messages.filter(function(message) {
-					return message.get('dateInt') > cursor;
+					return message.get('dateInt') < cursor;
 				}).length < 20;
 			}).map(function(folder) {
 				return getNextMessagePage(folder.account, folder, options);
 			}));
 		})).then(function() {
-			var allMessagesPage = allAccounts.map(function(account) {
+			var allMessagesPage = individualAccounts.map(function(account) {
 				return account.folders.filter(function(folder) {
 					// Only consider inboxes
 					// TODO: generalize for other combined mailboxes
-					return folder.get('specialUse') === 'inbox';
+					return folder.get('specialRole') === 'inbox';
 				}).map(function(folder) {
 					return folder.messages.filter(function(message) {
-						return message.get('dateInt') > cursor;
+						return message.get('dateInt') < cursor;
 					});
-				}).reduce(function(messages, all) {
+				}).reduce(function(all, messages) {
 					return all.concat(messages);
 				}, []);
 			}).reduce(function(all, messages) {
 				return all.concat(messages);
 			}, []);
 
-			var nextPage = allMessagesPage.filter(function(m) {
-				return m.get('dateInt') > cursor;
-			}).sort(function(message) {
+			var nextPage = allMessagesPage.sort(function(message) {
 				return message.get('dateInt') * -1;
 			}).slice(0, 20);
 
 			nextPage.forEach(function(msg) {
-				msg.set('unifiedId' , unifiedFolder.messages.getUnifiedId(msg));
+				msg.set('unifiedId', unifiedFolder.messages.getUnifiedId(msg));
 			});
 
 			unifiedFolder.addMessages(nextPage, unifiedFolder);

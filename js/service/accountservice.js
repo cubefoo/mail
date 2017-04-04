@@ -62,7 +62,14 @@ define(function(require) {
 			return Promise.resolve(accounts);
 		}
 
-		return Promise.resolve(accounts.fetch());
+		return new Promise(function(resolve, reject) {
+			accounts.fetch({
+				success: function() {
+					resolve(accounts);
+				},
+				error: reject
+			});
+		});
 	}
 
 	/**
