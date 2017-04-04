@@ -1,4 +1,4 @@
-/* global sinon */
+/* global sinon, expect */
 
 /**
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
@@ -227,7 +227,7 @@ define([
 		it('syncs the unified inbox, even if no accounts are configured', function(
 			done) {
 			var account = new Account({
-				id: 321,
+				accountId: -1,
 				isUnified: true
 			});
 			var folder = new Folder({
@@ -252,24 +252,19 @@ define([
 				accountId: 1
 			});
 			var folder11 = new Folder({
-				specialRole: 'inbox',
-				account: account
+				specialRole: 'inbox'
 			});
 			var folder12 = new Folder({
-				specialRole: 'sent',
-				account: account
+				specialRole: 'sent'
 			});
 			var acc2 = new Account({
-				accountId: 2,
-				account: account
+				accountId: 2
 			});
 			var folder21 = new Folder({
-				specialRole: 'inbox',
-				account: account
+				specialRole: 'inbox'
 			});
 			var folder22 = new Folder({
-				specialRole: 'inbox',
-				account: account
+				specialRole: 'inbox'
 			});
 			acc1.addFolder(folder11);
 			acc1.addFolder(folder12);
@@ -345,7 +340,7 @@ define([
 				// New message saved to first inbox
 				expect(folder11.messages.pluck('id')).toEqual([123]);
 				// Update applied in second inbox
-				expect(folder21.messages.first().get('subject')).toEqual('new sub');
+				expect(folder21.messages.get(234).get('subject')).toEqual('new sub');
 				// Vanished messag in third inbox is removed
 				expect(folder22.messages.pluck('id')).toEqual([]);
 

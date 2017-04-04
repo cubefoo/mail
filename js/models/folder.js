@@ -39,7 +39,11 @@ define(function(require) {
 				folder.account = this.account;
 			}, this));
 			this.unset('folders');
-			if (this.account && this.account.get('isUnified')) {
+			if (this.account && this.account.get('isUnified') === true) {
+				if (this.account.id != -1) {
+					console.error(this.account);
+					throw new Error('what?');
+				}
 				this.messages = new UnifiedMessageCollection();
 			} else {
 				this.messages = new MessageCollection();
