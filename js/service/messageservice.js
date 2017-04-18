@@ -1,4 +1,4 @@
-/* global Promise */
+/* global Promise, Infinity */
 
 /**
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
@@ -84,7 +84,7 @@ define(function(require) {
 		}).map(function(acc) {
 			// Select its inboxes
 			return acc.folders.filter(function(f) {
-				return f.get('specialRole') === 'inbox';
+				return f.get('specialUse') === 'inbox';
 			});
 		}).reduce(function(acc, f) {
 			// Flatten nested array
@@ -122,7 +122,7 @@ define(function(require) {
 
 	function getNextUnifiedMessagePage(unifiedFolder, options) {
 		var allAccounts = require('state').accounts;
-		var cursor = null;
+		var cursor = Infinity;
 		if (!unifiedFolder.messages.isEmpty()) {
 			cursor = unifiedFolder.messages.last().get('dateInt');
 		}
@@ -137,12 +137,12 @@ define(function(require) {
 			return Promise.all(account.folders.filter(function(folder) {
 				// Only consider inboxes
 				// TODO: generalize for other combined mailboxes
-				return folder.get('specialRole') === 'inbox';
+				return folder.get('specialUse') === 'inbox';
 			}).filter(function(folder) {
 				// Only fetch mailboxes that do not have enough data
 				return folder.messages.filter(function(message) {
 					return message.get('dateInt') < cursor;
-				}).length < 20;
+				}).length < 21;
 			}).map(function(folder) {
 				return getNextMessagePage(folder.account, folder, options);
 			}));
@@ -151,11 +151,13 @@ define(function(require) {
 				return account.folders.filter(function(folder) {
 					// Only consider inboxes
 					// TODO: generalize for other combined mailboxes
-					return folder.get('specialRole') === 'inbox';
+					return folder.get('specialUse') === 'inbox';
 				}).map(function(folder) {
-					return folder.messages.filter(function(message) {
+					var messages = folder.messages.filter(function(message) {
 						return message.get('dateInt') < cursor;
 					});
+					// Take all but the last message (acts as cursor)
+					return messages.slice(0, messages.length - 2);
 				}).reduce(function(all, messages) {
 					return all.concat(messages);
 				}, []);
